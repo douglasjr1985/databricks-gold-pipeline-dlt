@@ -1,0 +1,51 @@
+name: Deploy Delta Live Tables Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Prepare SQL files
+        run: |
+          mkdir -p sql_files
+          cp projects/pipe1/*.sql sql_files/
+          cp projects/pipe2/*.sql sql_files/
+
+      - name: Upload SQL files to Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          files=$(ls sql_files)
+          for file in $files; do
+            curl -n \
+              -F path="/dbfs/sql_files/$file" \
+              -F contents=@sql_files/$file \
+              -H "Authorization: Bearer $DATABRICKS_TOKEN" \
+              -X POST https://$DATABRICKS_HOST/api/2.0/dbfs/put
+          done
+
+      - name: Run pipeline script
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TARGET: ${{ secrets.DATABRICKS_TARGET }}
+          BASE_PATH: "sql_files"
+        run: |
+          python main.py
