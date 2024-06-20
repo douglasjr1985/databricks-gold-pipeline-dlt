@@ -8,7 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DBFS_LIB_PATH: dbfs:/sql_files
+      REPO_PATH: /Repos/Development
 
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -28,7 +32,14 @@ jobs:
 
       - name: Update Databricks Git folder
         run: |
-          databricks repos update --path /Repos/Development  --branch "${{ steps.extract_branch.outputs.branch }}"
+          databricks repos update --path ${{env.REPO_PATH}}  --branch "${{ steps.extract_branch.outputs.branch }}"
+
+      - name: Build Wheel and send to Databricks workspace DBFS location
+        run: |
+          cd $GITHUB_WORKSPACE
+          python setup.py bdist_wheel
+          dbfs cp --overwrite ./dist/* ${{env.DBFS_LIB_PATH}}
+          
       - name: Prepare SQL files
         run: |
           mkdir -p sql_files
