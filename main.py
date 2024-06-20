@@ -3,12 +3,11 @@
 import os
 from dlt_pipeline.pipeline import DeltaLiveTablesPipeline
 
-
 def main():
     token = os.getenv("DATABRICKS_TOKEN")
     host = os.getenv("DATABRICKS_HOST")
-    target = 'gold'
-    base_path = os.path.abspath("projects")
+    target = os.getenv("DATABRICKS_TARGET")
+    base_path = os.getenv("BASE_PATH", "projects")
 
     # Verificar cada pipe dentro da pasta projects
     for pipe in os.listdir(base_path):
@@ -18,6 +17,8 @@ def main():
 
             # Obter caminhos absolutos dos arquivos SQL
             sql_paths = [os.path.abspath(os.path.join(pipe_path, file)) for file in os.listdir(pipe_path) if file.endswith(".sql")]
+
+            print(f"Pipeline {name}: Encontrou arquivos SQL: {sql_paths}")
 
             # Instancia a classe
             dlt_pipeline = DeltaLiveTablesPipeline(token, host)

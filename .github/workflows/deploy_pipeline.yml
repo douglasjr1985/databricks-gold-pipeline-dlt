@@ -34,12 +34,14 @@ jobs:
         run: |
           files=$(ls sql_files)
           for file in $files; do
+            echo "Uploading file: $file"
             curl -n \
               -F path="/dbfs/sql_files/$file" \
               -F contents=@sql_files/$file \
               -H "Authorization: Bearer $DATABRICKS_TOKEN" \
               -X POST https://$DATABRICKS_HOST/api/2.0/dbfs/put
           done
+
 
       - name: Run pipeline script
         env:
