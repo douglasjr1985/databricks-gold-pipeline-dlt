@@ -30,8 +30,8 @@ jobs:
       - name: Configure Databricks CLI
         run: |
           mkdir -p ~/.databricks
-          echo -e "[DEFAULT]\nhost = ${{ secrets.DATABRICKS_HOST }}\ntoken = ${{ secrets.DATABRICKS_TOKEN }}" > ~/.databricks/config
-
+          echo -e "[DEFAULT]\nhost = https://${{ secrets.DATABRICKS_HOST }}\ntoken = ${{ secrets.DATABRICKS_TOKEN }}" > ~/.databricks/config
+  
       - name: Extract branch name
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
