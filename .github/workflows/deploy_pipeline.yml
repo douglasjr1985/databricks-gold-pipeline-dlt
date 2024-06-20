@@ -24,6 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests
+             pip install databricks-cli
         
       - name: Extract branch name
         shell: bash
