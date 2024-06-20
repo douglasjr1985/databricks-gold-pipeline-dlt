@@ -1,74 +1,70 @@
-name: Deploy Delta Live Tables Pipeline
+name: CI
 
 on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      DBFS_LIB_PATH: dbfs:/sql_files
+      DBFS_LIB_PATH: dbfs:/sql_files/
       REPO_PATH: /Repos/Development
 
-      
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: 3.8
 
       - name: Install dependencies
-        run: pip install requests
-             pip install databricks-cli
-        
+        run: |
+          pip install databricks-cli
+          pip install pytest setuptools wheel
+
+      - name: Configure Databricks CLI
+        run: |
+          databricks configure --token <<EOF
+          ${{ secrets.DATABRICKS_HOST }}
+          ${{ secrets.DATABRICKS_TOKEN }}
+          EOF
+
       - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Update Databricks Git folder
         run: |
-          databricks repos update --path ${{env.REPO_PATH}}  --branch "${{ steps.extract_branch.outputs.branch }}"
+          databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
 
-      - name: Build Wheel and send to Databricks workspace DBFS location
-        run: |
-          cd $GITHUB_WORKSPACE
-          python setup.py bdist_wheel
-          dbfs cp --overwrite ./dist/* ${{env.DBFS_LIB_PATH}}
-          
       - name: Prepare SQL files
         run: |
           mkdir -p sql_files
           cp projects/pipe1/*.sql sql_files/
           cp projects/pipe2/*.sql sql_files/
 
+      - name: Debug - List files
+        run: |
+          echo "Listing SQL files in sql_files directory:"
+          ls -alh sql_files
+
       - name: Upload SQL files to Databricks
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           files=$(ls sql_files)
           for file in $files; do
-            curl -n \
-              -F path="/dbfs/sql_files/$file" \
-              -F contents=@sql_files/$file \
-              -H "Authorization: Bearer $DATABRICKS_TOKEN" \
-              -X POST https://$DATABRICKS_HOST/api/2.0/dbfs/put
+            echo "Uploading file: $file"
+            databricks fs cp --overwrite sql_files/$file ${{ env.DBFS_LIB_PATH }}$file
           done
 
       - name: Run pipeline script
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          BASE_PATH: "sql_files"
+          DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
         run: |
           python main.py
-
-
-
-          
