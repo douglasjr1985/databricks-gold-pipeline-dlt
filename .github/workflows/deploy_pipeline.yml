@@ -20,7 +20,15 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests
+        
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
 
+      - name: Update Databricks Git folder
+        run: |
+          databricks repos update --path /Repos/Development  --branch "${{ steps.extract_branch.outputs.branch }}"
       - name: Prepare SQL files
         run: |
           mkdir -p sql_files
