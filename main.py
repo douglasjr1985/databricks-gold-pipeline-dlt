@@ -6,7 +6,7 @@ from dlt_pipeline.pipeline import DeltaLiveTablesPipeline
 def main():
     token = os.getenv("DATABRICKS_TOKEN")
     host = os.getenv("DATABRICKS_HOST")
-    target = os.getenv("DATABRICKS_TARGET")
+    target = 'gold'
     base_path = os.getenv("BASE_PATH", "projects")
 
     # Verificar cada pipe dentro da pasta projects
@@ -46,5 +46,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
