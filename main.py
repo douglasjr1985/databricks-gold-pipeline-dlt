@@ -1,5 +1,3 @@
-# main.py
-
 import os
 from dlt_pipeline.pipeline import DeltaLiveTablesPipeline
 
@@ -7,7 +5,7 @@ def main():
     token = os.getenv("DATABRICKS_TOKEN")
     host = os.getenv("DATABRICKS_HOST")
     target = 'gold'
-    base_path = os.getenv("BASE_PATH", "projects")
+    base_path = "/Repos/Development/databricks-gold-pipeline-dlt/projects"
 
     # Verificar cada pipe dentro da pasta projects
     for pipe in os.listdir(base_path):
@@ -15,8 +13,8 @@ def main():
         if os.path.isdir(pipe_path):
             name = f"DLT_{pipe}"
 
-            # Obter caminhos absolutos dos arquivos SQL
-            sql_paths = [os.path.abspath(os.path.join(pipe_path, file)) for file in os.listdir(pipe_path) if file.endswith(".sql")]
+            # Obter caminhos dos arquivos SQL
+            sql_paths = [os.path.join(pipe_path, file) for file in os.listdir(pipe_path) if file.endswith(".sql")]
 
             print(f"Pipeline {name}: Encontrou arquivos SQL: {sql_paths}")
 
