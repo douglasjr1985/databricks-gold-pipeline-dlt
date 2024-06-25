@@ -31,9 +31,9 @@ jobs:
         run: |
           mkdir -p ~/.databricks
           echo "[DEFAULT]" > ~/.databricks/config
-          echo "host = https://${{ secrets.DATABRICKS_HOST }}" >> ~/.databricks/config
-          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databricks/conf
-  
+          echo "host = ${{ secrets.DEPLOYMENT_TARGET_URL }}" >> ~/.databricks/config
+          echo "token = ${{ secrets.DEPLOYMENT_TARGET_TOKEN }}" >> ~/.databricks/config
+
       - name: Extract branch name
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
@@ -63,10 +63,9 @@ jobs:
 
       - name: Run pipeline script
         env:
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DEPLOYMENT_TARGET_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DEPLOYMENT_TARGET_URL }}
+          DATABRICKS_TARGET: ${{ secrets.DATABRICKS_TARGET }}
           DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
         run: |
           python main.py
-
-          
