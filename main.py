@@ -9,7 +9,7 @@ def main():
 
     dlt_pipeline = DeltaLiveTablesPipeline(token, host)
     
-    # Verificar cada pipe dentro da pasta projects no repositório do Databricks
+    # Verificar cada pipeline dentro da pasta projects no repositório do Databricks
     pipes = dlt_pipeline.list_repo_files(repo_base_path)
     for pipe in pipes:
         if pipe['object_type'] == 'DIRECTORY':
@@ -18,9 +18,13 @@ def main():
 
             # Obter caminhos dos arquivos SQL no repositório do Databricks
             sql_files = dlt_pipeline.list_repo_files(pipe_path)
-            sql_paths = [f"dbfs:{file['path']}" for file in sql_files if file['object_type'] == 'NOTEBOOK' and file['path'].endswith(".sql")]
+            sql_paths = [file['path'] for file in sql_files if file['path'].endswith(".sql")]
 
             print(f"Pipeline {name}: Encontrou arquivos SQL: {sql_paths}")
+
+            if not sql_paths:
+                print(f"Nenhum arquivo SQL encontrado para o pipeline {name}.")
+                continue
 
             # Criação do payload
             payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths)
