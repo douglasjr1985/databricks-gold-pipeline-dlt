@@ -31,20 +31,26 @@ jobs:
           echo "DATABRICKS_HOST=https://${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
+      - name: Debug - Print environment variables
+        run: |
+          echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST }}"
+          echo "DATABRICKS_TOKEN=${{ env.DATABRICKS_TOKEN }}"
+
       - name: Extract branch name
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Update Databricks Repo
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
         run: |
           databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
 
       - name: Run pipeline script
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+          DATABRICKS_TARGET: ${{ secrets.DATABRICKS_TARGET }}
         run: |
           python main.py
