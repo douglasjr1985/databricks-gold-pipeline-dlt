@@ -19,7 +19,7 @@ class DeltaLiveTablesPipeline:
             "Content-Type": "application/json"
         }
 
-    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour"):
+    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="unity_catalog"):
         """
         Cria o payload JSON para a criação de um pipeline Delta Live Tables.
 
@@ -29,6 +29,7 @@ class DeltaLiveTablesPipeline:
             sql_paths (list): Lista de caminhos dos arquivos SQL.
             num_workers (int): Número de trabalhadores no cluster.
             trigger_interval (str): Intervalo de gatilho para execução do pipeline.
+            catalog (str): Nome do catálogo Unity Catalog a ser usado.
 
         Returns:
             dict: Payload JSON.
@@ -45,7 +46,8 @@ class DeltaLiveTablesPipeline:
                 }
             ],
             "configuration": {
-                "pipelines.trigger.interval": trigger_interval
+                "pipelines.trigger.interval": trigger_interval,
+                "pipelines.metastore.catalog": catalog
             }
         }
 
@@ -116,6 +118,8 @@ class DeltaLiveTablesPipeline:
         url = f"{self.host}/api/2.0/workspace/list"
         response = requests.get(url, headers=self.headers, params={"path": path})
         if response.status_code == 200:
-            return response.json().get('objects', [])
+            files = response.json().get('objects', [])
+            print(f"Arquivos no caminho {path}: {files}")  # Adiciona log para depuração
+            return files
         else:
             raise Exception(f"Erro ao listar arquivos no repositório: {response.text}")
