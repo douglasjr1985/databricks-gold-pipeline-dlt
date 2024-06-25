@@ -5,15 +5,15 @@ def main():
     token = os.getenv("DATABRICKS_TOKEN")
     host = os.getenv("DATABRICKS_HOST")
     target = 'gold'
-    base_path = "/Repos/Development/databricks-gold-pipeline-dlt/projects"
+    repo_base_path = "/Repos/Development/databricks-gold-pipeline-dlt/projects"
 
-    # Verificar cada pipe dentro da pasta projects
-    for pipe in os.listdir(base_path):
-        pipe_path = os.path.join(base_path, pipe)
+    # Verificar cada pipe dentro da pasta projects no repositório do Databricks
+    for pipe in os.listdir(repo_base_path):
+        pipe_path = os.path.join(repo_base_path, pipe)
         if os.path.isdir(pipe_path):
             name = f"DLT_{pipe}"
 
-            # Obter caminhos dos arquivos SQL
+            # Obter caminhos dos arquivos SQL no repositório do Databricks
             sql_paths = [os.path.join(pipe_path, file) for file in os.listdir(pipe_path) if file.endswith(".sql")]
 
             print(f"Pipeline {name}: Encontrou arquivos SQL: {sql_paths}")
@@ -40,7 +40,6 @@ def main():
 
             except Exception as e:
                 print(f"Erro no pipeline {name}: {str(e)}")
-
 
 if __name__ == "__main__":
     main()
