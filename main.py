@@ -7,19 +7,20 @@ def main():
     target = 'gold'
     repo_base_path = "/Repos/Development/databricks-gold-pipeline-dlt/projects"
 
+    dlt_pipeline = DeltaLiveTablesPipeline(token, host)
+    
     # Verificar cada pipe dentro da pasta projects no repositório do Databricks
-    for pipe in os.listdir(repo_base_path):
-        pipe_path = os.path.join(repo_base_path, pipe)
-        if os.path.isdir(pipe_path):
-            name = f"DLT_{pipe}"
+    pipes = dlt_pipeline.list_repo_files(repo_base_path)
+    for pipe in pipes:
+        if pipe['object_type'] == 'DIRECTORY':
+            pipe_path = pipe['path']
+            name = f"DLT_{pipe['path'].split('/')[-1]}"
 
             # Obter caminhos dos arquivos SQL no repositório do Databricks
-            sql_paths = [os.path.join(pipe_path, file) for file in os.listdir(pipe_path) if file.endswith(".sql")]
+            sql_files = dlt_pipeline.list_repo_files(pipe_path)
+            sql_paths = [f"dbfs:{file['path']}" for file in sql_files if file['object_type'] == 'NOTEBOOK' and file['path'].endswith(".sql")]
 
             print(f"Pipeline {name}: Encontrou arquivos SQL: {sql_paths}")
-
-            # Instancia a classe
-            dlt_pipeline = DeltaLiveTablesPipeline(token, host)
 
             # Criação do payload
             payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths)

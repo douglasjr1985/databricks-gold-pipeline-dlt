@@ -2,8 +2,6 @@
 
 import requests
 import json
-import os
-
 
 class DeltaLiveTablesPipeline:
     def __init__(self, token, host):
@@ -104,3 +102,20 @@ class DeltaLiveTablesPipeline:
             return response.json()
         else:
             raise Exception(f"Erro ao obter o status do pipeline: {response.text}")
+
+    def list_repo_files(self, path):
+        """
+        Lista os arquivos em um caminho especificado no repositório Databricks.
+
+        Args:
+            path (str): Caminho no repositório Databricks.
+
+        Returns:
+            list: Lista de objetos no caminho especificado.
+        """
+        url = f"https://{self.host}/api/2.0/workspace/list"
+        response = requests.get(url, headers=self.headers, params={"path": path})
+        if response.status_code == 200:
+            return response.json().get('objects', [])
+        else:
+            raise Exception(f"Erro ao listar arquivos no repositório: {response.text}")
