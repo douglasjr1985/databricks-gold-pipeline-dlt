@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DBFS_LIB_PATH: dbfs:/sql_files/
-      REPO_PATH: /Repos/Development/your-repo-name
+      REPO_PATH: /Repos/Development/databricks-gold-pipeline-dlt
 
     steps:
       - name: Checkout code
