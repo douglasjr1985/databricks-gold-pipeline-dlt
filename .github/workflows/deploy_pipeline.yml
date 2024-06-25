@@ -10,7 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      DBFS_LIB_PATH: dbfs:/sql_files/
       REPO_PATH: /Repos/Development/databricks-gold-pipeline-dlt
 
     steps:
@@ -32,48 +31,20 @@ jobs:
           echo "DATABRICKS_HOST=https://${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Debug - Print environment variables
-        run: |
-          echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST }}"
-          echo "DATABRICKS_TOKEN=${{ env.DATABRICKS_TOKEN }}"
-
       - name: Extract branch name
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
-      - name: Update Databricks Git folder
+      - name: Update Databricks Repo
         env:
-          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
 
-      - name: Prepare SQL files
-        run: |
-          mkdir -p sql_files
-          cp projects/pipe1/*.sql sql_files/
-          cp projects/pipe2/*.sql sql_files/
-
-      - name: Debug - List files
-        run: |
-          echo "Listing SQL files in sql_files directory:"
-          ls -alh sql_files
-
-      - name: Upload SQL files to Databricks
-        env:
-          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
-        run: |
-          files=$(ls sql_files)
-          for file in $files; do
-            echo "Uploading file: $file"
-            databricks fs cp --overwrite sql_files/$file ${{ env.DBFS_LIB_PATH }}$file
-          done
-
       - name: Run pipeline script
         env:
-          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
-          DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           python main.py
