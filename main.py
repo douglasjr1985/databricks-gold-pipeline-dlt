@@ -4,7 +4,8 @@ from dlt_pipeline.pipeline import DeltaLiveTablesPipeline
 def main():
     token = os.getenv("DATABRICKS_TOKEN")
     host = os.getenv("DATABRICKS_HOST")
-    target = 'gold'
+    target = 'default'
+    catalog = 'datalake_hml'  
     repo_base_path = "/Repos/Development/databricks-gold-pipeline-dlt/projects"
 
     dlt_pipeline = DeltaLiveTablesPipeline(token, host)
@@ -27,7 +28,7 @@ def main():
                 continue
 
             # Criação do payload
-            payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths)
+            payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths, catalog=catalog)
 
             try:
                 # Criação do pipeline
@@ -48,4 +49,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
