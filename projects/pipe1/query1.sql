@@ -32,6 +32,7 @@ SELECT f.customer_id, f.customer_name, f.number_of_line_items,
 
 -- COMMAND ----------
 
+
 CREATE LIVE TABLE sales_order_in_la
 COMMENT "Sales orders in LA."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "gold")
