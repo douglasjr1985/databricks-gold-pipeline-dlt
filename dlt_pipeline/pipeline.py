@@ -43,7 +43,7 @@ class DeltaLiveTablesPipeline:
             "clusters": [
                 {
                     "label": "default",
-                    "num_workers": num_workers
+                    "num_workers": max(num_workers, 1)  # Garantir pelo menos 1 trabalhador
                 }
             ],
             "configuration": {
