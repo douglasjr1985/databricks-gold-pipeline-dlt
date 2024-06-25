@@ -68,3 +68,5 @@ jobs:
           DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
         run: |
           python main.py
+
+          
