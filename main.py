@@ -28,7 +28,7 @@ def main():
                 continue
 
             # Criação do payload
-            payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths, catalog=catalog)
+            payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths, catalog)
 
             try:
                 # Criação do pipeline

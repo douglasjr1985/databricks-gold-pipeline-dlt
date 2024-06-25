@@ -19,7 +19,7 @@ class DeltaLiveTablesPipeline:
             "Content-Type": "application/json"
         }
 
-    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="unity_catalog"):
+    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="risk"):
         """
         Cria o payload JSON para a criação de um pipeline Delta Live Tables.
 
@@ -35,8 +35,9 @@ class DeltaLiveTablesPipeline:
             dict: Payload JSON.
         """
         libraries = [{"file": {"path": path}} for path in sql_paths]
-        return {
+        payload = {
             "name": name,
+            "catalog": catalog,
             "target": target,
             "libraries": libraries,
             "clusters": [
@@ -46,10 +47,10 @@ class DeltaLiveTablesPipeline:
                 }
             ],
             "configuration": {
-                "pipelines.trigger.interval": trigger_interval,
-                "pipelines.metastore.catalog": catalog
+                "pipelines.trigger.interval": trigger_interval
             }
         }
+        return payload
 
     def create_pipeline(self, payload):
         """
