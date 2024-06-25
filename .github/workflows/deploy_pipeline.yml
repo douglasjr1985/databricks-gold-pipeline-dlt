@@ -29,8 +29,13 @@ jobs:
 
       - name: Set Databricks environment variables
         run: |
-          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+          echo "DATABRICKS_HOST=https://${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Debug - Print environment variables
+        run: |
+          echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST }}"
+          echo "DATABRICKS_TOKEN=${{ env.DATABRICKS_TOKEN }}"
 
       - name: Extract branch name
         id: extract_branch
@@ -38,8 +43,8 @@ jobs:
 
       - name: Update Databricks Git folder
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
         run: |
           databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
 
@@ -56,8 +61,8 @@ jobs:
 
       - name: Upload SQL files to Databricks
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
         run: |
           files=$(ls sql_files)
           for file in $files; do
@@ -67,8 +72,8 @@ jobs:
 
       - name: Run pipeline script
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
           DATABRICKS_TARGET: ${{ secrets.DATABRICKS_TARGET }}
           DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
         run: |
