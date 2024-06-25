@@ -40,6 +40,13 @@ jobs:
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
+      - name: Pull latest changes in Databricks Repo
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+        run: |
+          databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
+
       - name: Update Databricks Repo
         env:
           DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
