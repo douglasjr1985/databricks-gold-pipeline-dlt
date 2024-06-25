@@ -27,18 +27,19 @@ jobs:
           pip install databricks-cli
           pip install pytest setuptools wheel
 
-      - name: Configure Databricks CLI
+      - name: Set Databricks environment variables
         run: |
-          mkdir -p ~/.databricks
-          echo "[DEFAULT]" > ~/.databricks/config
-          echo "host = ${{ secrets.DEPLOYMENT_TARGET_URL }}" >> ~/.databricks/config
-          echo "token = ${{ secrets.DEPLOYMENT_TARGET_TOKEN }}" >> ~/.databricks/config
+          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Extract branch name
         id: extract_branch
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Update Databricks Git folder
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks repos update --path ${{ env.REPO_PATH }} --branch "${{ env.branch }}"
 
@@ -54,6 +55,9 @@ jobs:
           ls -alh sql_files
 
       - name: Upload SQL files to Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           files=$(ls sql_files)
           for file in $files; do
@@ -63,8 +67,8 @@ jobs:
 
       - name: Run pipeline script
         env:
-          DATABRICKS_TOKEN: ${{ secrets.DEPLOYMENT_TARGET_TOKEN }}
-          DATABRICKS_HOST: ${{ secrets.DEPLOYMENT_TARGET_URL }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_TARGET: ${{ secrets.DATABRICKS_TARGET }}
           DBFS_LIB_PATH: ${{ env.DBFS_LIB_PATH }}
         run: |
