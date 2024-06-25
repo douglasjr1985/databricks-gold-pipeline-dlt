@@ -59,7 +59,7 @@ class DeltaLiveTablesPipeline:
         Returns:
             dict: Resposta da API.
         """
-        url = f"https://{self.host}/api/2.0/pipelines"
+        url = f"{self.host}/api/2.0/pipelines"
         response = requests.post(url, headers=self.headers, data=json.dumps(payload))
 
         if response.status_code == 200:
@@ -77,7 +77,7 @@ class DeltaLiveTablesPipeline:
         Returns:
             dict: Resposta da API.
         """
-        url = f"https://{self.host}/api/2.0/pipelines/{pipeline_id}/updates"
+        url = f"{self.host}/api/2.0/pipelines/{pipeline_id}/updates"
         response = requests.post(url, headers=self.headers)
 
         if response.status_code == 200:
@@ -95,7 +95,7 @@ class DeltaLiveTablesPipeline:
         Returns:
             dict: Resposta da API.
         """
-        url = f"https://{self.host}/api/2.0/pipelines/{pipeline_id}"
+        url = f"{self.host}/api/2.0/pipelines/{pipeline_id}"
         response = requests.get(url, headers=self.headers)
 
         if response.status_code == 200:
@@ -113,7 +113,7 @@ class DeltaLiveTablesPipeline:
         Returns:
             list: Lista de objetos no caminho especificado.
         """
-        url = f"https://{self.host}/api/2.0/workspace/list"
+        url = f"{self.host}/api/2.0/workspace/list"
         response = requests.get(url, headers=self.headers, params={"path": path})
         if response.status_code == 200:
             return response.json().get('objects', [])
