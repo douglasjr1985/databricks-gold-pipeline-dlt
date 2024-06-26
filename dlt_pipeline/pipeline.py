@@ -43,7 +43,18 @@ class DeltaLiveTablesPipeline:
             "clusters": [
                 {
                     "label": "default",
+                    "aws_attributes": {
+                        "instance_profile_arn": "arn:aws:iam::463684499885:instance-profile/DatabricksGlueHML"
+                    },
+                    "node_type_id": "m5d.xlarge",
+                    "driver_node_type_id": "m5d.xlarge",
                     "num_workers": max(num_workers, 1)  # Garantir pelo menos 1 trabalhador
+                },
+                {
+                    "label": "maintenance",
+                    "aws_attributes": {
+                        "instance_profile_arn": "arn:aws:iam::463684499885:instance-profile/DatabricksGlueHML"
+                    }
                 }
             ],
             "configuration": {
