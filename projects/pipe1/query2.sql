@@ -8,7 +8,7 @@ COMMENT "The raw sales orders, ingested from /databricks-datasets."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "bronze")
 AS SELECT * FROM hive_metastore.teste.usuarios;
 
--- CREATE STREAMING LIVE TABLE sales_orders_cleaned
+
 CREATE OR REFRESH LIVE TABLE sales_orders_cleaned
 COMMENT "The cleaned sales orders with valid order_number(s) and partitioned by order_datetime."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "silver")
