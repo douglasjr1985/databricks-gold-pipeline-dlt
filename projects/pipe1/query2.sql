@@ -16,25 +16,23 @@ TBLPROPERTIES ("myCompanyPipeline.quality" = "silver")
 AS
 SELECT c.idade as idade
   FROM LIVE.sales_orders_raw f
-  LEFT JOIN LIVE.customers c  ON c.idade = f.idade;  
+  LEFT JOIN LIVE.customers c  ON c.idade = f.idade;
 
-CREATE LIVE TABLE sales_order_in_la
+CREATE OR REFRESH LIVE TABLE sales_order_in_la
 COMMENT "Sales orders in LA."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "gold")
 AS
 SELECT  COUNT(*) as product_count
 FROM (
   SELECT idade
-  FROM LIVE.sales_orders_cleaned 
-  );
+  FROM LIVE.sales_orders_cleaned );
 
 
-CREATE LIVE TABLE sales_order_in_chicago
+CREATE OR REFRESH LIVE TABLE sales_order_in_chicago
 COMMENT "Sales orders in Chicago."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "gold")
 AS
 SELECT  COUNT(*) as product_count
 FROM (
   SELECT idade
-  FROM LIVE.sales_orders_cleaned 
-  );
+  FROM LIVE.sales_orders_cleaned  );
