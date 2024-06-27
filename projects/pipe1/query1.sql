@@ -36,4 +36,3 @@ SELECT  COUNT(*) as product_count
 FROM (
   SELECT idade
   FROM LIVE.sales_orders_cleaned  );
-
