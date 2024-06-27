@@ -1,10 +1,10 @@
-CREATE STREAMING LIVE TABLE customers
+CREATE OR REFRESH LIVE TABLE customers
 COMMENT "The customers buying finished products, ingested from /databricks-datasets."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "mapping")
 AS SELECT * FROM hive_metastore.teste.usuarios;
 
 
-CREATE STREAMING LIVE TABLE sales_orders_raw
+CREATE OR REFRESH LIVE TABLE sales_orders_raw
 COMMENT "The raw sales orders, ingested from /databricks-datasets."
 TBLPROPERTIES ("myCompanyPipeline.quality" = "bronze")
 AS SELECT * FROM hive_metastore.teste.usuarios;
