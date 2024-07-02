@@ -1,5 +1,6 @@
 import requests
 import json
+import base64
 
 class DeltaLiveTablesPipeline:
     def __init__(self, token, host):
@@ -181,6 +182,7 @@ class DeltaLiveTablesPipeline:
         url = f"{self.host}/api/2.0/workspace/export"
         response = requests.get(url, headers=self.headers, params={"path": path, "format": "SOURCE"})
         if response.status_code == 200:
-            return response.json().get('content', '')
+            content = response.json().get('content', '')
+            return base64.b64decode(content).decode('utf-8')
         else:
             raise Exception(f"Erro ao obter o conteúdo do arquivo: {response.text}")
