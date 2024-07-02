@@ -30,7 +30,8 @@ def main():
     pipes = dlt_pipeline.list_repo_files(repo_base_path)
     for pipe in pipes:
         if pipe['object_type'] == 'DIRECTORY':
-            pipe_path = pipe['path']
+            #pipe_path = pipe['path']
+            pipe_path = os.path.join(repo_base_path, pipe['path'].split('/')[-1])
             name = f"DLT_{pipe['path'].split('/')[-1]}"
 
             # Obter caminhos dos arquivos SQL no repositório do Databricks
