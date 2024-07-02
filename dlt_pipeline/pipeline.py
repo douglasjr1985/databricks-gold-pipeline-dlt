@@ -46,7 +46,7 @@ class DeltaLiveTablesPipeline:
                     },
                     "node_type_id": "m5d.xlarge",
                     "driver_node_type_id": "m5d.xlarge",
-                    "num_workers": max(num_workers, 1)  # Garantir pelo menos 1 trabalhador
+                    "num_workers": num_workers  
                 },
                 {
                     "label": "maintenance",
