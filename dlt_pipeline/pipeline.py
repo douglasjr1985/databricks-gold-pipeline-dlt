@@ -17,7 +17,7 @@ class DeltaLiveTablesPipeline:
             "Content-Type": "application/json"
         }
 
-    def create_pipeline_payload(self, name, target, sql_paths, num_workers, trigger_interval="1 hour", catalog="risk"):
+    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="risk"):
         """
         Cria o payload JSON para a criação de um pipeline Delta Live Tables.
 
@@ -46,7 +46,7 @@ class DeltaLiveTablesPipeline:
                     },
                     "node_type_id": "m5d.xlarge",
                     "driver_node_type_id": "m5d.xlarge",
-                    "num_workers": num_workers  
+                    "num_workers": max(num_workers, 1)  # Garantir pelo menos 1 trabalhador
                 },
                 {
                     "label": "maintenance",
@@ -161,7 +161,7 @@ class DeltaLiveTablesPipeline:
         """
         url = f"{self.host}/api/2.0/workspace/list"
         response = requests.get(url, headers=self.headers, params={"path": path})
-        if response.status_code == 200:
+        if response.status_code == 200):
             files = response.json().get('objects', [])
             print(f"Arquivos no caminho {path}: {files}")  # Adiciona log para depuração
             return files
