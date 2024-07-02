@@ -17,7 +17,7 @@ class DeltaLiveTablesPipeline:
             "Content-Type": "application/json"
         }
 
-    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="risk"):
+    def create_pipeline_payload(self, name, target, sql_paths, num_workers=5, trigger_interval="1 hour", catalog="risk"):
         """
         Cria o payload JSON para a criação de um pipeline Delta Live Tables.
 
