@@ -66,26 +66,20 @@ def main():
                     catalog=catalog
                 )
 
-                try:
-                    # Tentar obter o status do pipeline para verificar se ele existe
-                    try:
-                        status_response = dlt_pipeline.get_pipeline_status(name)
-                        pipeline_id = status_response["pipeline_id"]
-                        print(f"Pipeline {name} já existe com ID: {pipeline_id}")
+                # Verificar se o pipeline existe
+                existing_pipelines = dlt_pipeline.list_pipelines()
+                pipeline_exists = False
+                pipeline_id = None
+                for pipeline in existing_pipelines:
+                    if pipeline['name'] == name:
+                        pipeline_exists = True
+                        pipeline_id = pipeline['pipeline_id']
+                        break
 
-                        # Atualização do pipeline
-                        update_response = dlt_pipeline.update_pipeline(pipeline_id, payload)
-                        print(f"Pipeline {name} atualizado com sucesso! ID: {pipeline_id}")
-
-                    except Exception as e:
-                        error_message = str(e)
-                        if "RESOURCE_DOES_NOT_EXIST" in error_message:
-                            # Se o pipeline não existir, criar um novo
-                            create_response = dlt_pipeline.create_pipeline(payload)
-                            pipeline_id = create_response["pipeline_id"]
-                            print(f"Pipeline {name} criado com sucesso! ID: {pipeline_id}")
-                        else:
-                            raise e
+                if pipeline_exists:
+                    # Atualizar pipeline existente
+                    update_response = dlt_pipeline.update_pipeline(pipeline_id, payload)
+                    print(f"Pipeline {name} atualizado com sucesso! ID: {pipeline_id}")
 
                     # Verificar se há uma atualização ativa antes de iniciar o pipeline
                     try:
@@ -100,12 +94,24 @@ def main():
                     # Verificação do status
                     status_response = dlt_pipeline.get_pipeline_status(pipeline_id)
                     print(f"Status do Pipeline {name}: {status_response['state']}")
+                else:
+                    # Criar novo pipeline
+                    create_response = dlt_pipeline.create_pipeline(payload)
+                    pipeline_id = create_response["pipeline_id"]
+                    print(f"Pipeline {name} criado com sucesso! ID: {pipeline_id}")
 
-                except Exception as e:
-                    print(f"Erro no pipeline {name}: {str(e)}")
+                    # Início do pipeline
+                    start_response = dlt_pipeline.start_pipeline(pipeline_id)
+                    print(f"Pipeline {name} iniciado com sucesso! ID da execução: {start_response['update_id']}")
+
+                    # Verificação do status
+                    status_response = dlt_pipeline.get_pipeline_status(pipeline_id)
+                    print(f"Status do Pipeline {name}: {status_response['state']}")
 
             except FileNotFoundError as e:
                 print(e)
+            except Exception as e:
+                print(f"Erro no pipeline {name}: {str(e)}")
 
 if __name__ == "__main__":
     main()
