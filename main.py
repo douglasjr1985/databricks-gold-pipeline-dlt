@@ -2,22 +2,29 @@ import os
 import json
 from dlt_pipeline.pipeline import DeltaLiveTablesPipeline
 
-def load_pipeline_params(pipe_path):
+def load_pipeline_params(dlt_pipeline, pipe_path):
     """
     Carrega os parâmetros do pipeline a partir do arquivo pipeline_params.json.
 
     Args:
+        dlt_pipeline (DeltaLiveTablesPipeline): Instância da classe DeltaLiveTablesPipeline.
         pipe_path (str): Caminho da pasta do pipeline.
 
     Returns:
         dict: Parâmetros do pipeline.
     """
-    params_path = os.path.join(pipe_path, 'pipeline_params.json')
-    if os.path.exists(params_path):
-        with open(params_path, 'r') as f:
-            return json.load(f)
+    params_files = dlt_pipeline.list_repo_files(pipe_path)
+    params_file_path = None
+    for file in params_files:
+        if file['path'].endswith("pipeline_params.json"):
+            params_file_path = file['path']
+            break
+
+    if params_file_path:
+        file_content = dlt_pipeline.get_file_content(params_file_path)
+        return json.loads(file_content)
     else:
-        raise FileNotFoundError(f"Arquivo de parâmetros não encontrado: {params_path}")
+        raise FileNotFoundError(f"Arquivo de parâmetros não encontrado: {pipe_path}/pipeline_params.json")
 
 def main():
     token = os.getenv("DATABRICKS_TOKEN")
@@ -30,7 +37,7 @@ def main():
     pipes = dlt_pipeline.list_repo_files(repo_base_path)
     for pipe in pipes:
         if pipe['object_type'] == 'DIRECTORY':
-            pipe_path = os.path.join(repo_base_path, pipe['path'].split('/')[-1])
+            pipe_path = pipe['path']
             name = f"DLT_{pipe['path'].split('/')[-1]}"
 
             # Obter caminhos dos arquivos SQL no repositório do Databricks
@@ -45,7 +52,7 @@ def main():
 
             try:
                 # Carregar os parâmetros do pipeline
-                params = load_pipeline_params(pipe_path)
+                params = load_pipeline_params(dlt_pipeline, pipe_path)
                 target = params.get("target", "default")
                 catalog = params.get("catalog", "datalake_hml")
                 num_workers = params.get("num_workers", 1)
