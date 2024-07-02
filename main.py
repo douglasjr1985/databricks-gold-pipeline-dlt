@@ -56,8 +56,32 @@ def main():
                 print(f"Status do Pipeline {name}: {status_response['state']}")
 
             except Exception as e:
-                print(f"Erro no pipeline {name}: {str(e)}")
+                error_message = str(e)
+                if "RESOURCE_CONFLICT" in error_message:
+                    # Pipeline já existe, obter ID do pipeline existente
+                    existing_pipelines = dlt_pipeline.list_pipelines()
+                    pipeline_id = None
+                    for pipeline in existing_pipelines:
+                        if pipeline['name'] == name:
+                            pipeline_id = pipeline['pipeline_id']
+                            break
+
+                    if pipeline_id:
+                        # Atualizar pipeline existente
+                        update_response = dlt_pipeline.update_pipeline(pipeline_id, payload)
+                        print(f"Pipeline {name} atualizado com sucesso! ID: {pipeline_id}")
+
+                        # Início do pipeline
+                        start_response = dlt_pipeline.start_pipeline(pipeline_id)
+                        print(f"Pipeline {name} iniciado com sucesso! ID da execução: {start_response['update_id']}")
+
+                        # Verificação do status
+                        status_response = dlt_pipeline.get_pipeline_status(pipeline_id)
+                        print(f"Status do Pipeline {name}: {status_response['state']}")
+                    else:
+                        print(f"Erro ao encontrar o pipeline existente para {name}")
+                else:
+                    print(f"Erro no pipeline {name}: {error_message}")
 
 if __name__ == "__main__":
     main()
-

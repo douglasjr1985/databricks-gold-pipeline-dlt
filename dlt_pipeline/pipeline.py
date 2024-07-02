@@ -17,7 +17,7 @@ class DeltaLiveTablesPipeline:
             "Content-Type": "application/json"
         }
 
-    def create_pipeline_payload(self, name, target, sql_paths, num_workers=5, trigger_interval="1 hour", catalog="risk"):
+    def create_pipeline_payload(self, name, target, sql_paths, num_workers=2, trigger_interval="1 hour", catalog="risk"):
         """
         Cria o payload JSON para a criação de um pipeline Delta Live Tables.
 
@@ -133,6 +133,21 @@ class DeltaLiveTablesPipeline:
             return response.json()
         else:
             raise Exception(f"Erro ao obter o status do pipeline: {response.text}")
+
+    def list_pipelines(self):
+        """
+        Lista todos os pipelines Delta Live Tables no Databricks.
+
+        Returns:
+            list: Lista de pipelines.
+        """
+        url = f"{self.host}/api/2.0/pipelines"
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            return response.json().get("statuses", [])
+        else:
+            raise Exception(f"Erro ao listar os pipelines: {response.text}")
 
     def list_repo_files(self, path):
         """
