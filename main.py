@@ -31,10 +31,21 @@ def main():
             payload = dlt_pipeline.create_pipeline_payload(name, target, sql_paths, catalog=catalog)
 
             try:
-                # Criação do pipeline
-                create_response = dlt_pipeline.create_pipeline(payload)
-                pipeline_id = create_response["pipeline_id"]
-                print(f"Pipeline {name} criado com sucesso! ID: {pipeline_id}")
+                # Tentar obter o status do pipeline para verificar se ele existe
+                try:
+                    status_response = dlt_pipeline.get_pipeline_status(name)
+                    pipeline_id = status_response["pipeline_id"]
+                    print(f"Pipeline {name} já existe com ID: {pipeline_id}")
+
+                    # Atualização do pipeline
+                    update_response = dlt_pipeline.update_pipeline(pipeline_id, payload)
+                    print(f"Pipeline {name} atualizado com sucesso! ID: {pipeline_id}")
+
+                except Exception as e:
+                    # Se o pipeline não existir, criar um novo
+                    create_response = dlt_pipeline.create_pipeline(payload)
+                    pipeline_id = create_response["pipeline_id"]
+                    print(f"Pipeline {name} criado com sucesso! ID: {pipeline_id}")
 
                 # Início do pipeline
                 start_response = dlt_pipeline.start_pipeline(pipeline_id)

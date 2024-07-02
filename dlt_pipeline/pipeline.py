@@ -1,5 +1,3 @@
-# dlt_pipeline/pipeline.py
-
 import requests
 import json
 
@@ -80,6 +78,25 @@ class DeltaLiveTablesPipeline:
             return response.json()
         else:
             raise Exception(f"Erro ao criar o pipeline: {response.text}")
+
+    def update_pipeline(self, pipeline_id, payload):
+        """
+        Atualiza um pipeline Delta Live Tables no Databricks.
+
+        Args:
+            pipeline_id (str): ID do pipeline a ser atualizado.
+            payload (dict): Payload JSON com as atualizações do pipeline.
+
+        Returns:
+            dict: Resposta da API.
+        """
+        url = f"{self.host}/api/2.0/pipelines/{pipeline_id}"
+        response = requests.put(url, headers=self.headers, data=json.dumps(payload))
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"Erro ao atualizar o pipeline: {response.text}")
 
     def start_pipeline(self, pipeline_id):
         """
