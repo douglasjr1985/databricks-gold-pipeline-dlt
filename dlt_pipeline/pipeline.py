@@ -167,3 +167,20 @@ class DeltaLiveTablesPipeline:
             return files
         else:
             raise Exception(f"Erro ao listar arquivos no repositório: {response.text}")
+
+    def get_file_content(self, path):
+        """
+        Obtém o conteúdo de um arquivo em um caminho especificado no repositório Databricks.
+
+        Args:
+            path (str): Caminho no repositório Databricks.
+
+        Returns:
+            str: Conteúdo do arquivo.
+        """
+        url = f"{self.host}/api/2.0/workspace/export"
+        response = requests.get(url, headers=self.headers, params={"path": path, "format": "SOURCE"})
+        if response.status_code == 200:
+            return response.json().get('content', '')
+        else:
+            raise Exception(f"Erro ao obter o conteúdo do arquivo: {response.text}")
