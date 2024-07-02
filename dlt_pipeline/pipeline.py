@@ -161,7 +161,7 @@ class DeltaLiveTablesPipeline:
         """
         url = f"{self.host}/api/2.0/workspace/list"
         response = requests.get(url, headers=self.headers, params={"path": path})
-        if response.status_code == 200):
+        if response.status_code == 200:
             files = response.json().get('objects', [])
             print(f"Arquivos no caminho {path}: {files}")  # Adiciona log para depuração
             return files
