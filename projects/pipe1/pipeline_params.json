@@ -1,6 +1,6 @@
 {
     "catalog": "datalake_hml",
     "target": "default",
-    "num_workers":1,
+    "num_workers":15,
     "schedule":"teste"
 }
