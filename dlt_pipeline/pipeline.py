@@ -144,7 +144,7 @@ class DeltaLiveTablesPipeline:
         url = f"{self.host}/api/2.0/pipelines"
         response = requests.get(url, headers=self.headers)
 
-        if response.status_code == 200):
+        if response.status_code == 200:
             return response.json().get("statuses", [])
         else:
             raise Exception(f"Erro ao listar os pipelines: {response.text}")
