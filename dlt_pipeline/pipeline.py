@@ -58,7 +58,8 @@ class DeltaLiveTablesPipeline:
             ],
             "configuration": {
                 "pipelines.trigger.interval": trigger_interval
-            }
+            },
+            "allow_duplicate_names": True  # Permitir nomes duplicados
         }
         return payload
 
